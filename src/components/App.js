@@ -62,7 +62,8 @@ function App() {
     history.push('/signin')
   }
   function handleTokenCheck() {
-    if (localStorage.getItem('jwt')) {
+    const jwt = localStorage.getItem('jwt')
+    if (jwt) {
       auth.checkToken(jwt).then((res) => {
         if(res) {
           setIsLoggedIn(true)
