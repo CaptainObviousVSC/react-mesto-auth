@@ -1,6 +1,6 @@
 import React from 'react';
 import '../index.css';
-import { Route, BrowserRouter, Switch, Link } from 'react-router-dom'
+import { Route, BrowserRouter, Switch, useHistory } from 'react-router-dom'
 import Header from './Header'
 import Main from './Main'
 import PopupWithForm from './PopupWithForm'
@@ -14,22 +14,21 @@ import EditAvatarPopup from './EditeAvatarPopup'
 import Register from './Register'
 import Login from './Login'
 import ProtectedRoute from './ProtectedRoute'
+import auth from '../utils/auth'
 function App() {
+  const history = useHistory()
   const [isProfilePopupOpen, setIsProfilePopupOpen] = React.useState(false)
   const [isAddPlacePopupOpen, setIsAddPopupOpen] = React.useState(false)
   const [isEditAvatarPopupOpen, setIsAvatarPopupOpen] = React.useState(false)
   const [isConfirmPopupOpen, setIsConfirmPopupOpen] = React.useState(false)
   const [isLoggedIn, setIsLoggedIn] = React.useState(false)
+  const [email, setEmail] = React.useState('')
   const [selectedCard, setSelectedCard] = React.useState({ name: '', link: '' });
   const [currentUser, setCurrentUser] = React.useState({});
   const [cards, setCards] = React.useState([])
   function handleConfirmDeleteClick() {
     setIsConfirmPopupOpen(true)
   }
-  function handleLoggedIn() {
-    setIsLoggedIn(true)
-  }
-  console.log(isLoggedIn)
   function handleCardLike(cardId) {
     api.likeCard(cardId).then((newCard) => {
       const newCards = cards.map((item) => item._id === cardId ? newCard : item)
@@ -40,6 +39,38 @@ function App() {
     api.createCard(item).then((item) => {
       setCards([item, ...cards])
     }).catch(err => console.error(err))
+  }
+  function onLogin(email, password) {
+    auth.getLogin(email, password)
+      .then(() => {
+        console.log(email, password)
+        setIsLoggedIn(true)
+        console.log(history)
+        history.push('/')
+      }).catch(err => console.log(err))
+  }
+  function onRegister(email, password) {
+    auth.getRegister(password, email).then(() => {
+      history.push('/signin');
+    }).catch((err) => {
+      console.log(err)
+    });
+  }
+  function onSignOut() {
+    localStorage.removeItem('jwt')
+    setIsLoggedIn(false)
+    history.push('/signin')
+  }
+  function handleTokenCheck() {
+    if (localStorage.getItem('jwt')) {
+      auth.checkToken(jwt).then((res) => {
+        if(res) {
+          setIsLoggedIn(true)
+          history.push('/')
+          setEmail(res.data.email)
+        }
+      })
+    }
   }
   function handleCardDislike(cardId) {
     api.dislikeCard(cardId).then((newCard) => {
@@ -86,33 +117,33 @@ function App() {
     <CurrentUserContext.Provider value={currentUser} >
       <div className="page">
         <BrowserRouter>
-        <Header />
+          <Header setOnSIgnOut={onSignOut} onTokenCheck={handleTokenCheck} />
           <Switch>
-          <ProtectedRoute 
-      exact path="/" 
-      loggedIn={isLoggedIn}
-      onEditProfile={handleEditProfileClick}
-      onEditAvatar={handleEditAvatarClick}
-      onAddPlace={handleAddCardClick}
-      onConfirmDelete={handleConfirmDeleteClick}
-      onCardClick={handleCardClick}
-      onCardDelete={handleCardDelete}
-      onCardLike={handleCardLike}
-      onCardDislike={handleCardDislike}
-      cards={cards}
-      setingCards={setCards}
-      onCurrentUser={setCurrentUser}
-      editProfileisOpen={isProfilePopupOpen}
-      addCardisOpen={isAddPlacePopupOpen}
-      editAvatarIsOpen={isEditAvatarPopupOpen}
-      confirmDeleteIsOpen={isConfirmPopupOpen}
-      component={Main}
-/>
+            <ProtectedRoute
+              exact path="/"
+              loggedIn={isLoggedIn}
+              onEditProfile={handleEditProfileClick}
+              onEditAvatar={handleEditAvatarClick}
+              onAddPlace={handleAddCardClick}
+              onConfirmDelete={handleConfirmDeleteClick}
+              onCardClick={handleCardClick}
+              onCardDelete={handleCardDelete}
+              onCardLike={handleCardLike}
+              onCardDislike={handleCardDislike}
+              cardsMap={cards}
+              setingCards={setCards}
+              onCurrentUser={setCurrentUser}
+              editProfileisOpen={isProfilePopupOpen}
+              addCardisOpen={isAddPlacePopupOpen}
+              editAvatarIsOpen={isEditAvatarPopupOpen}
+              confirmDeleteIsOpen={isConfirmPopupOpen}
+              component={Main}
+            />
             <Route path="/signin">
-              <Login />
+              <Login setOnLogin={onLogin} />
             </Route>
             <Route path="/signup">
-              <Register />
+              <Register setOnRegister={onRegister} />
             </Route>
           </Switch>
         </BrowserRouter>

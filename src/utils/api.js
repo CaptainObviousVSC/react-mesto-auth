@@ -108,7 +108,7 @@ export class Api {
   }
 }
 const api = new Api({
-  baseUrl: 'https://auth.nomoreparties.co',
+  baseUrl: 'https://mesto.nomoreparties.co/v1/cohort-14',
   headers: {
     authorization: '56ec9a7b-ee96-4d3a-a0c8-688e4ca62fd8',
     'Content-Type': 'application/json'
