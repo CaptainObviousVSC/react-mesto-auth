@@ -1,7 +1,7 @@
 import React from 'react';
 import logo from '../images/logo.svg';
 import { Route, Link, Switch } from 'react-router-dom'
-function Header({ onTokenCheck }) {
+function Header({ onEmail, setEmail }) {
     return (
         <header className="header">
             <img className="header__logo" src={logo} alt="Логотип" />
@@ -13,7 +13,7 @@ function Header({ onTokenCheck }) {
                     <Link to="/signup" className="header__signup-link">Зарегистрироваться</Link>
                 </Route>
                 <Route path="/">
-                    <p>{onTokenCheck}</p>
+                    <p className="header__email">{onEmail}</p>
                     <Link to="/signin" className="header__signout-link">Выход</Link>
                 </Route>
             </Switch>
