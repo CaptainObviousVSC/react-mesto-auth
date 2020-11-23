@@ -15,9 +15,6 @@ function EditProfilePopup({ isOpen, onClose, onUpdateUser }) {
             name: name,
             about: about
         })
-        onClose()
-       setName('')
-       setAbout('')
     }
     return (
         <PopupWithForm name="popup_edit" isOpen={isOpen} title="Редактировать профиль" onClose={onClose} onSubmit={handleSubmit}>

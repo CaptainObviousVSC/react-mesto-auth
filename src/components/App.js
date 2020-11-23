@@ -1,6 +1,6 @@
 import React from 'react';
 import '../index.css';
-import { Route, Switch, useHistory } from 'react-router-dom'
+import { Route, Switch, useHistory, withRouter } from 'react-router-dom'
 import Header from './Header'
 import Main from './Main'
 import PopupWithForm from './PopupWithForm'
@@ -29,6 +29,16 @@ function App() {
   const [currentUser, setCurrentUser] = React.useState({});
   const [cards, setCards] = React.useState([])
   const [status, setStatus] = React.useState({})
+    React.useEffect(() => {
+        api.getInformation().then((data) => {
+            setCurrentUser(data)
+        }).catch(err => console.error(err))
+    }, [])
+    React.useEffect(() => {
+        api.getCards().then((data) => {
+            setCards(data)
+        }).catch(err => console.error(err))
+    }, [])
   function handleConfirmDeleteClick() {
     setIsConfirmPopupOpen(true)
   }
@@ -41,6 +51,7 @@ function App() {
   function handleAddPlaceClick(item) {
     api.createCard(item).then((item) => {
       setCards([item, ...cards])
+      setIsAddPopupOpen(false)
     }).catch(err => console.error(err))
   }
   function handleInfoTooltip() {
@@ -51,7 +62,9 @@ function App() {
     const jwt = localStorage.getItem('jwt')
     if (jwt) {
       auth.checkToken(jwt).then((data) => {
+        console.log(jwt)
         if(data) {
+            setEmail(data.data.email)
           setIsLoggedIn(true)
           history.push('/')
         }
@@ -71,6 +84,7 @@ function App() {
     auth.getLogin(email, password)
       .then((data) => {
         localStorage.setItem('jwt', data.token)
+        console.log(data.token)
         setIsLoggedIn(true)
          setEmail(email)
         history.push('/')
@@ -122,17 +136,19 @@ function App() {
   function handleUpdateUser(item) {
     api.editInformation(item).then((item) => {
       setCurrentUser({ ...currentUser, name: item.name, about: item.about })
+      setIsProfilePopupOpen(false)
     }).catch(err => console.error(err))
   }
   function handleUpdateAvatar(item) {
     api.editAvatar(item).then((item) => {
       setCurrentUser({ ...currentUser, avatar: item.avatar })
+      setIsAvatarPopupOpen(false)
     }).catch(err => console.error(err))
   }
   function closePopups() {
+    setIsAvatarPopupOpen(false)
     setIsProfilePopupOpen(false)
     setIsAddPopupOpen(false)
-    setIsAvatarPopupOpen(false)
     setIsConfirmPopupOpen(false)
     setIsInfoTooltip(false)
     setSelectedCard({})
@@ -166,8 +182,6 @@ function App() {
               onCardLike={handleCardLike}
               onCardDislike={handleCardDislike}
               cardsMap={cards}
-              setingCards={setCards}
-              onCurrentUser={setCurrentUser}
               editProfileisOpen={isProfilePopupOpen}
               addCardisOpen={isAddPlacePopupOpen}
               editAvatarIsOpen={isEditAvatarPopupOpen}
@@ -212,4 +226,4 @@ function App() {
   );
 }
 
-export default App;
+export default withRouter(App);

@@ -9,7 +9,6 @@ function AddPlacePopup({ isOpen, onClose, onAddPlace }) {
       name: inputPlace.current.value,
       link: inputLink.current.value
     })
-    onClose()
     e.target.reset()
   }
   return (

@@ -7,7 +7,6 @@ function EditAvatarPopup({ isOpen, onClose, onUpdateAvatar }) {
         onUpdateAvatar({
             avatar: inputAvatar.current.value
         })
-        onClose()
         e.target.reset()
     }
     return (

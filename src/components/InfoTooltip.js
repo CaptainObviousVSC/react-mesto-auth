@@ -1,5 +1,4 @@
 import React from 'react'
-import { Route, Switch } from 'react-router-dom'
 import '../styles/InfoTooltip.css'
 import X from '../images/X.svg'
 import checkMark from '../images/check-mark.svg'
