@@ -30,6 +30,7 @@ function App() {
   const [cards, setCards] = React.useState([])
   const [status, setStatus] = React.useState({})
     React.useEffect(() => {
+      handleTokenCheck()
         api.getInformation().then((data) => {
             setCurrentUser(data)
         }).catch(err => console.error(err))
